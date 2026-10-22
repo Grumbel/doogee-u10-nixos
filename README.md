@@ -89,6 +89,9 @@ root partition is grown to fill the card.
   that interface, see [Known issues](#known-issues).
 - **On the tablet**: with a USB keyboard, log in as `root`, password
   `doogee`. Change it with `passwd`.
+
+SSH only accepts keys (`authorized_keys`), no passwords: the console
+passwords are the same on every image.
 - **Serial console** (inside the case): 1500000 baud, as in rk3562deb.
 
 ### Power button

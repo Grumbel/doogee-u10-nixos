@@ -171,9 +171,14 @@
 
   # --- Access -----------------------------------------------------------------
 
+  # Keys only: the image ships with well-known console passwords
   services.openssh = {
     enable = true;
-    settings.PermitRootLogin = "prohibit-password";
+    settings = {
+      PermitRootLogin = "prohibit-password";
+      PasswordAuthentication = false;
+      KbdInteractiveAuthentication = false;
+    };
   };
   # SSH public keys from authorized_keys on the FAT partition
   systemd.services.doogee-ssh-keys = {
