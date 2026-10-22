@@ -129,7 +129,7 @@ in `/root`.
 
 ```nix
 {
-  inputs.doogee-u10.url = "path:/path/to/doogee10-nixos";
+  inputs.doogee-u10.url = "path:/path/to/doogee-u10-nixos";
 
   outputs = { nixpkgs, doogee-u10, ... }: {
     nixosConfigurations.mytablet = nixpkgs.lib.nixosSystem {
