@@ -1,0 +1,23 @@
+doogee-u10-nixos licensing
+==========================
+
+Unless stated otherwise, the files in this repository (Nix code, scripts,
+documentation) are licensed under the MIT license:
+
+  SPDX-License-Identifier: MIT
+
+Exceptions:
+
+  kernel/doogee-u10.fragment      GPL-2.0-or-later (kernel configuration)
+  kernel/doogee-u10.config        generated from the Linux kernel's Kconfig,
+                                  GPL-2.0
+
+The kernel, U-Boot, rkbin and rk3562deb sources fetched at build time
+(see sources.nix) keep their own licenses.
+
+License texts:
+
+  LICENSES/GPL-2.0.txt
+  LICENSES/MIT.txt
+
+Copyright (c) 2026 Ingo Ruhnke

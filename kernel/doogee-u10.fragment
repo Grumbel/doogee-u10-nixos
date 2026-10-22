@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
 # Changes to rk3562deb's rockchip_linux_defconfig. The first part repeats
 # what rk3562deb's build.sh sets with scripts/config (Panfrost GPU stack),
 # the second part is what NixOS needs on top.

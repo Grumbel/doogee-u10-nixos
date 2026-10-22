@@ -16,19 +16,18 @@ Bluetooth, RK817 power management and audio codec.
 
 ## Status
 
+Early: the system boots and is usable over the network, most of the
+hardware hasn't been checked yet.
+
 | | |
 |---|---|
-| Kernel, U-Boot, SD card image | build |
-| Everything else | not yet tested on the tablet |
-
-What rk3562deb has working and this configuration sets up: display,
-touchscreen, GPU (Mesa Panfrost), Wi-Fi, Bluetooth, speaker and
-microphone, accelerometer (screen rotation), battery and charging, power
-key and suspend, USB-C (host and device).
-
-Not ported from rk3562deb: hardware video decoding (Rockchip MPP / VA-API,
-prebuilt libraries), the NPU (RKLLM), cameras, the flashlight helper, the
-Phosh desktop.
+| Booting from microSD (vendor U-Boot, extlinux on the ext4 root) | ✅ |
+| Display, console | ✅ |
+| Wi-Fi (2.4 and 5 GHz) | ✅ tested on 5 GHz, 802.11ac |
+| USB networking to a PC (USB-C) | ✅ including unplugging and replugging |
+| SSH, `deploy.sh` | ✅ |
+| Touchscreen, GPU (Mesa Panfrost), Bluetooth, speaker and microphone, accelerometer (screen rotation), battery and charging, power key and suspend, USB host | set up as in rk3562deb, not checked yet |
+| Hardware video decoding (Rockchip MPP / VA-API), NPU (RKLLM), cameras, flashlight | ❌ not ported from rk3562deb |
 
 ## What you need
 
@@ -86,7 +85,8 @@ root partition is grown to fill the card.
 - **Over Wi-Fi**: `ssh root@doogee-u10.local`
 - **Over USB**: connect the tablet's USB-C port to your PC. A new network
   interface appears on the PC; then `ssh root@10.42.0.1` (or
-  `ssh root@doogee-u10-usb.local`).
+  `ssh root@doogee-u10-usb.local`). The PC has to take a DHCP lease on
+  that interface, see [Known issues](#known-issues).
 - **On the tablet**: with a USB keyboard, log in as `root`, password
   `doogee`. Change it with `passwd`.
 - **Serial console** (inside the case): 1500000 baud, as in rk3562deb.
@@ -200,10 +200,36 @@ config (usually a missing dependency).
 - `build.sh` also enables a few kernel options that have no effect there
   (missing dependencies); the fragment leaves them out or adds the
   dependency (`NF_CONNTRACK`).
+- USB-C device mode: rk3562deb switches the USB role from its HUSB320
+  Type-C driver, but the HUSB320 doesn't answer on I²C (not under Android
+  either, where no driver binds to it). After the cable was unplugged, the
+  DWC3 controller runtime-suspended and nothing woke it when a PC was
+  plugged in again; the PC then saw a full-speed device that failed with
+  `error -71`. A udev rule keeps DWC3 out of runtime suspend.
+
+## Known issues
+
+- **USB networking, PC side**: the PC has to take a DHCP lease on the new
+  interface for `10.42.0.1` to work. A NetworkManager profile with
+  `ipv4.method link-local` won't
+  (`nmcli con mod "<profile>" ipv4.method auto`); `deploy.sh` and the
+  IPv6 link-local address work either way.
+- **USB networking, first connection**: the gadget also offers RNDIS. If
+  the PC's `cdc_subset` driver binds before `rndis_host` is loaded, the
+  interface comes up but passes no traffic ("Second interface
+  unclaimable"); replug, or load `rndis_host` first.
+- **USB host mode** (OTG adapter): untested; with the HUSB320 not
+  answering, it's unclear how the port would switch to host mode.
 
 ## License
 
-The hardware support is derived from
+- Nix code, scripts and documentation: [MIT](LICENSES/MIT.txt)
+- Kernel config fragment `kernel/doogee-u10.fragment`:
+  [GPL-2.0-or-later](LICENSES/GPL-2.0.txt)
+- `kernel/doogee-u10.config`: generated from the Linux kernel's Kconfig,
+  GPL-2.0
+
+See [LICENSE](LICENSE) for details. The hardware support is derived from
 [rk3562deb](https://github.com/tech4bot/rk3562deb) (MIT). The kernel,
-U-Boot and rkbin keep their own licenses; rkbin and the Seekwave firmware
-are binary blobs.
+U-Boot and rkbin, which are fetched at build time, keep their own
+licenses; rkbin and the Seekwave firmware are binary blobs.
