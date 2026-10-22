@@ -284,6 +284,11 @@ in
       # The sensors also show up as joysticks
       SUBSYSTEM=="input", KERNEL=="js[0-9]*", ATTRS{name}=="gsensor|mir3da", RUN+="${pkgs.coreutils}/bin/rm -f /dev/input/%k"
       SUBSYSTEM=="input", KERNEL=="event*", ATTRS{name}=="gsl3673", ENV{ID_INPUT}="1", ENV{ID_INPUT_TOUCHSCREEN}="1"
+      # USB-C: the DWC3 controller runtime-suspends after a disconnect and
+      # nothing wakes it when a PC is plugged in again (the HUSB320 doesn't
+      # answer, and the PHY's VBUS events don't reach DWC3): the PC then
+      # fails to enumerate it (full speed, error -71). Keep it awake.
+      ACTION=="add|bind", SUBSYSTEM=="platform", KERNEL=="fe500000.usb", ATTR{power/control}="on"
     '';
 
     # --- Power ------------------------------------------------------------
